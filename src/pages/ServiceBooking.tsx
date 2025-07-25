@@ -13,49 +13,94 @@ const ServiceBooking = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const [formData, setFormData] = useState({
-    pickupLocation: '',
-    dropoffLocation: '',
-    date: '',
-    time: '',
-    specialRequests: ''
-  });
+  const [formData, setFormData] = useState<Record<string, string>>({});
 
   const serviceDetails = {
     'rent-car': {
       title: 'Rent a Car',
       description: 'Book a self-drive rental car',
-      fields: ['pickupLocation', 'date', 'time', 'specialRequests']
+      fields: {
+        pickupLocation: { label: 'Pickup Location', type: 'text', required: true },
+        date: { label: 'Rental Date', type: 'date', required: true },
+        time: { label: 'Pickup Time', type: 'time', required: true },
+        returnDate: { label: 'Return Date', type: 'date', required: true },
+        carType: { label: 'Car Type', type: 'select', required: true, options: ['Economy', 'Compact', 'Mid-size', 'Full-size', 'Premium', 'Luxury'] }
+      }
     },
     'airport': {
       title: 'Airport Services',
       description: 'Airport pickup and drop-off service',
-      fields: ['pickupLocation', 'dropoffLocation', 'date', 'time', 'specialRequests']
+      fields: {
+        serviceType: { label: 'Service Type', type: 'select', required: true, options: ['Airport Pickup', 'Airport Drop-off'] },
+        pickupLocation: { label: 'Pickup Location', type: 'text', required: true },
+        dropoffLocation: { label: 'Drop-off Location', type: 'text', required: true },
+        flightNumber: { label: 'Flight Number', type: 'text', required: true },
+        date: { label: 'Travel Date', type: 'date', required: true },
+        time: { label: 'Flight Time', type: 'time', required: true }
+      }
     },
     'intercity': {
       title: 'Intercity Travel',
       description: 'Travel between cities comfortably',
-      fields: ['pickupLocation', 'dropoffLocation', 'date', 'time', 'specialRequests']
+      fields: {
+        pickupLocation: { label: 'Pickup City', type: 'text', required: true },
+        dropoffLocation: { label: 'Destination City', type: 'text', required: true },
+        date: { label: 'Travel Date', type: 'date', required: true },
+        time: { label: 'Departure Time', type: 'time', required: true },
+        passengers: { label: 'Number of Passengers', type: 'number', required: true, min: 1, max: 8 },
+        tripType: { label: 'Trip Type', type: 'select', required: true, options: ['One Way', 'Round Trip'] }
+      }
     },
     'trip': {
       title: 'Day Trip',
       description: 'City exploration packages',
-      fields: ['pickupLocation', 'date', 'time', 'specialRequests']
+      fields: {
+        pickupLocation: { label: 'Pickup Location', type: 'text', required: true },
+        destinations: { label: 'Places to Visit', type: 'textarea', required: true },
+        date: { label: 'Trip Date', type: 'date', required: true },
+        time: { label: 'Start Time', type: 'time', required: true },
+        duration: { label: 'Trip Duration', type: 'select', required: true, options: ['4 Hours', '8 Hours', '12 Hours', 'Full Day'] },
+        passengers: { label: 'Number of Passengers', type: 'number', required: true, min: 1, max: 8 }
+      }
     },
     'corporate': {
       title: 'Corporate Driver',
       description: 'Professional business transportation',
-      fields: ['pickupLocation', 'dropoffLocation', 'date', 'time', 'specialRequests']
+      fields: {
+        pickupLocation: { label: 'Pickup Location', type: 'text', required: true },
+        dropoffLocation: { label: 'Drop-off Location', type: 'text', required: true },
+        date: { label: 'Service Date', type: 'date', required: true },
+        time: { label: 'Pickup Time', type: 'time', required: true },
+        passengers: { label: 'Number of Passengers', type: 'number', required: true, min: 1, max: 4 },
+        companyName: { label: 'Company Name', type: 'text', required: true },
+        serviceType: { label: 'Service Type', type: 'select', required: true, options: ['Executive Meeting', 'Airport Transfer', 'Client Transport', 'Daily Commute'] }
+      }
     },
     'events': {
       title: 'Events',
       description: 'Special occasion transportation',
-      fields: ['pickupLocation', 'dropoffLocation', 'date', 'time', 'specialRequests']
+      fields: {
+        pickupLocation: { label: 'Pickup Location', type: 'text', required: true },
+        dropoffLocation: { label: 'Event Venue', type: 'text', required: true },
+        eventType: { label: 'Event Type', type: 'select', required: true, options: ['Wedding', 'Birthday Party', 'Corporate Event', 'Anniversary', 'Graduation', 'Other'] },
+        date: { label: 'Event Date', type: 'date', required: true },
+        time: { label: 'Pickup Time', type: 'time', required: true },
+        duration: { label: 'Service Duration', type: 'select', required: true, options: ['2 Hours', '4 Hours', '6 Hours', '8 Hours', 'All Day'] },
+        passengers: { label: 'Number of Passengers', type: 'number', required: true, min: 1, max: 12 }
+      }
     },
     'outstation': {
       title: 'Outstation Travel',
       description: 'Long distance travel service',
-      fields: ['pickupLocation', 'dropoffLocation', 'date', 'time', 'specialRequests']
+      fields: {
+        pickupLocation: { label: 'Pickup Location', type: 'text', required: true },
+        dropoffLocation: { label: 'Destination', type: 'text', required: true },
+        date: { label: 'Departure Date', type: 'date', required: true },
+        returnDate: { label: 'Return Date', type: 'date', required: false },
+        time: { label: 'Departure Time', type: 'time', required: true },
+        passengers: { label: 'Number of Passengers', type: 'number', required: true, min: 1, max: 8 },
+        vehicleType: { label: 'Vehicle Type', type: 'select', required: true, options: ['Sedan', 'SUV', 'Tempo Traveller', 'Mini Bus'] }
+      }
     }
   };
 
@@ -67,11 +112,122 @@ const ServiceBooking = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate required fields
+    const missingFields = Object.entries(currentService.fields)
+      .filter(([_, config]) => config.required && !formData[_])
+      .map(([field]) => field);
+    
+    if (missingFields.length > 0) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     toast({
       title: "Booking Submitted",
       description: "Your booking request has been submitted successfully. We'll contact you shortly.",
     });
     navigate('/dashboard');
+  };
+
+  const renderField = (fieldName: string, config: any) => {
+    const { label, type, required, options, min, max } = config;
+    
+    switch (type) {
+      case 'select':
+        return (
+          <div key={fieldName} className="space-y-2">
+            <Label htmlFor={fieldName} className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-primary" />
+              {label} {required && <span className="text-destructive">*</span>}
+            </Label>
+            <select
+              id={fieldName}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              value={formData[fieldName] || ''}
+              onChange={(e) => handleInputChange(fieldName, e.target.value)}
+              required={required}
+            >
+              <option value="">Select {label}</option>
+              {options.map((option: string) => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+          </div>
+        );
+      
+      case 'textarea':
+        return (
+          <div key={fieldName} className="space-y-2">
+            <Label htmlFor={fieldName}>
+              {label} {required && <span className="text-destructive">*</span>}
+            </Label>
+            <Textarea
+              id={fieldName}
+              placeholder={`Enter ${label.toLowerCase()}`}
+              value={formData[fieldName] || ''}
+              onChange={(e) => handleInputChange(fieldName, e.target.value)}
+              required={required}
+              rows={3}
+            />
+          </div>
+        );
+      
+      case 'number':
+        return (
+          <div key={fieldName} className="space-y-2">
+            <Label htmlFor={fieldName}>
+              {label} {required && <span className="text-destructive">*</span>}
+            </Label>
+            <Input
+              id={fieldName}
+              type="number"
+              min={min}
+              max={max}
+              placeholder={`Enter ${label.toLowerCase()}`}
+              value={formData[fieldName] || ''}
+              onChange={(e) => handleInputChange(fieldName, e.target.value)}
+              required={required}
+            />
+          </div>
+        );
+      
+      default:
+        return (
+          <div key={fieldName} className="space-y-2">
+            <Label htmlFor={fieldName} className="flex items-center gap-2">
+              {(fieldName.includes('location') || fieldName.includes('Location')) && (
+                <MapPin className="h-4 w-4 text-primary" />
+              )}
+              {fieldName === 'date' && <Calendar className="h-4 w-4 text-primary" />}
+              {fieldName === 'time' && <Clock className="h-4 w-4 text-primary" />}
+              {label} {required && <span className="text-destructive">*</span>}
+            </Label>
+            <Input
+              id={fieldName}
+              type={type}
+              placeholder={type === 'text' ? `Enter ${label.toLowerCase()}` : ''}
+              value={formData[fieldName] || ''}
+              onChange={(e) => handleInputChange(fieldName, e.target.value)}
+              required={required}
+            />
+            {(fieldName.includes('location') || fieldName.includes('Location')) && (
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="sm"
+                className="w-full"
+              >
+                Choose on Map
+              </Button>
+            )}
+          </div>
+        );
+    }
   };
 
   if (!currentService) {
@@ -108,99 +264,8 @@ const ServiceBooking = () => {
 
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
-                {currentService.fields.includes('pickupLocation') && (
-                  <div className="space-y-2">
-                    <Label htmlFor="pickup" className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-primary" />
-                      Pickup Location
-                    </Label>
-                    <Input
-                      id="pickup"
-                      placeholder="Enter pickup address"
-                      value={formData.pickupLocation}
-                      onChange={(e) => handleInputChange('pickupLocation', e.target.value)}
-                      required
-                    />
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      size="sm"
-                      className="w-full"
-                    >
-                      Choose on Map
-                    </Button>
-                  </div>
-                )}
-
-                {currentService.fields.includes('dropoffLocation') && (
-                  <div className="space-y-2">
-                    <Label htmlFor="dropoff" className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-primary" />
-                      Drop-off Location
-                    </Label>
-                    <Input
-                      id="dropoff"
-                      placeholder="Enter drop-off address"
-                      value={formData.dropoffLocation}
-                      onChange={(e) => handleInputChange('dropoffLocation', e.target.value)}
-                      required
-                    />
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      size="sm"
-                      className="w-full"
-                    >
-                      Choose on Map
-                    </Button>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {currentService.fields.includes('date') && (
-                    <div className="space-y-2">
-                      <Label htmlFor="date" className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-primary" />
-                        Date
-                      </Label>
-                      <Input
-                        id="date"
-                        type="date"
-                        value={formData.date}
-                        onChange={(e) => handleInputChange('date', e.target.value)}
-                        required
-                      />
-                    </div>
-                  )}
-
-                  {currentService.fields.includes('time') && (
-                    <div className="space-y-2">
-                      <Label htmlFor="time" className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-primary" />
-                        Time
-                      </Label>
-                      <Input
-                        id="time"
-                        type="time"
-                        value={formData.time}
-                        onChange={(e) => handleInputChange('time', e.target.value)}
-                        required
-                      />
-                    </div>
-                  )}
-                </div>
-
-                {currentService.fields.includes('specialRequests') && (
-                  <div className="space-y-2">
-                    <Label htmlFor="requests">Special Requests</Label>
-                    <Textarea
-                      id="requests"
-                      placeholder="Any special requirements or preferences..."
-                      value={formData.specialRequests}
-                      onChange={(e) => handleInputChange('specialRequests', e.target.value)}
-                      rows={3}
-                    />
-                  </div>
+                {Object.entries(currentService.fields).map(([fieldName, config]) => 
+                  renderField(fieldName, config)
                 )}
 
                 <div className="pt-4">

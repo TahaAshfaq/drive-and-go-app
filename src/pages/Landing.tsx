@@ -53,7 +53,7 @@ const Landing = () => {
               <Button 
                 variant="hero" 
                 size="lg" 
-                className="text-lg px-8 py-6 h-auto animate-float"
+                className="text-lg px-8 py-6 h-auto"
                 onClick={() => navigate('/phone-verification')}
               >
                 <Car className="mr-2 h-6 w-6" />
