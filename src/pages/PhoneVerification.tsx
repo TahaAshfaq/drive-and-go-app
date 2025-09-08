@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
 const PhoneVerification = () => {
+    const [fullName, setFullName] = useState('');
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otp, setOtp] = useState('');
@@ -56,7 +57,7 @@ const PhoneVerification = () => {
         title: "Phone Verified",
         description: "Your phone number has been successfully verified",
       });
-      navigate('/onboarding');
+      navigate('/dashboard');
     }, 1500);
   };
 
@@ -105,6 +106,16 @@ const PhoneVerification = () => {
                     required
                   />
                 </div>
+                <div>
+                <Input
+                  type="text"
+                  placeholder="Enter your full name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className="text-center text-lg"
+                  required
+                />
+              </div>
                 <Button 
                   type="submit" 
                   className="w-full" 
