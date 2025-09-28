@@ -43,15 +43,15 @@ const Dashboard = () => {
     route: "/airport-services",
       buttonText: "Schedule Pickup",
     },
-    {
-      id: "intercity",
-      title: "Intercity Travel",
-      description: "Comfortable intercity transportation services",
-      icon: MapPin,
-      img: "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d",
-      route: "/service/intercity",
-      buttonText: "Plan Journey",
-    },
+    // {
+    //   id: "intercity",
+    //   title: "Intercity Travel",
+    //   description: "Comfortable intercity transportation services",
+    //   icon: MapPin,
+    //   img: "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d",
+    //   route: "/service/intercity",
+    //   buttonText: "Plan Journey",
+    // },
     {
       id: "trip",
       title: "Trip Planning",
@@ -61,24 +61,24 @@ const Dashboard = () => {
       route: "/service/trip",
       buttonText: "Start Planning",
     },
-    {
-      id: "corporate",
-      title: "Corporate Driver",
-      description: "Professional drivers for business travel",
-      icon: Briefcase,
-      img: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85",
-      route: "/service/corporate",
-      buttonText: "Book Service",
-    },
-    {
-      id: "events",
-      title: "Events",
-      description: "Transportation solutions for special events",
-      icon: PartyPopper,
-      img: "https://images.unsplash.com/photo-1511578314322-379afb476865",
-      route: "/service/events",
-      buttonText: "Plan Event",
-    },
+    // {
+    //   id: "corporate",
+    //   title: "Corporate Driver",
+    //   description: "Professional drivers for business travel",
+    //   icon: Briefcase,
+    //   img: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85",
+    //   route: "/service/corporate",
+    //   buttonText: "Book Service",
+    // },
+    // {
+    //   id: "events",
+    //   title: "Events",
+    //   description: "Transportation solutions for special events",
+    //   icon: PartyPopper,
+    //   img: "https://images.unsplash.com/photo-1511578314322-379afb476865",
+    //   route: "/service/events",
+    //   buttonText: "Plan Event",
+    // },
     {
       id: "outstation",
       title: "City-to-City",
@@ -153,13 +153,13 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <main className="px-6 py-12 w-full flex flex-col items-center gap-8 bg-background">
-        <div className="max-w-[1280px] w-full flex flex-wrap gap-6">
+<div className="max-w-[1280px] w-full flex flex-col md:flex-row flex-wrap gap-6">
           {services.map((service) => (
             <div
               key={service.id}
-              className="flex flex-col rounded-md border border-border bg-card shadow-sm basis-[calc(33.33%-16px)] overflow-hidden"
+              className="flex flex-col rounded-md border border-border bg-card shadow-sm basis-[calc(50%-16px)] overflow-hidden"
             >
-              <img src={service.img} className="h-48 w-full object-cover" />
+              <img src={service.img} className="h-60 w-full object-cover" />
               <div className="flex flex-col gap-6 px-6 py-6">
                 <div className="flex flex-col gap-1 w-full">
                   <div className="flex items-center justify-between w-full">

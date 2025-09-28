@@ -17,6 +17,7 @@ import AirportServicesForm from "./pages/AirportServicesForm";
 import DriverDashboard from "./pages/DriverDashboard";
 import Account from "./pages/Account";
 import Admindashboard from "./pages/Admindahboard";
+import DriverView from "./pages/DriverView";
 
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
           <Route path="/driver-dashboard" element={<DriverDashboard />} />
           <Route path="/account" element={<Account />} />
           <Route path="/admin-dashboard" element={<Admindashboard />} />
+          <Route path="/driver-view" element={<DriverView />} />
 
           <Route path="*" element={<NotFound />} />
         </Routes>
